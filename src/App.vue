@@ -53,23 +53,30 @@
     }
   }
 
+  *:not(html) {
+    font-size: 11px;
+    letter-spacing: 0.055px;
+  }
+
   html {
     font-size: 16px;
   }
 
-  html, * {
-    letter-spacing: -.05;
+  body {
+    margin: 0;
+  }
+
+  *, *::after, *::before {
     box-sizing: border-box;
+    line-height: 16px;
   }
 
   .using-keyboard *:focus {
-    box-shadow: 0 0 0 3px rgba(#4D90FE, .33);
+    box-shadow: 0 0 0 2px #18a0fb;
   }
   
   body {
-    margin: 1.25rem 1rem 0;
     color: #333;
     overflow: hidden;
-    font-size: 12px;
   }
 </style>

@@ -1,5 +1,5 @@
 {
-  "name": "figma-plugin-bunch-description-change",
+  "name": "[DEV] Bunch description change",
   "id": "822757547991641929",
   "api": "1.0.0",
   "main": "build/main.js",
