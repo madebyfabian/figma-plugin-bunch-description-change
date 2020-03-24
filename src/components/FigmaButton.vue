@@ -2,6 +2,7 @@
   <button 
     @click="$emit('click')"
     :type="type"
+    :tabindex="type === 'tertiary' ? 1 : 0"
     :disabled="disabled">
     
     <slot />
@@ -47,7 +48,7 @@
         background: rgba(#000, .3);
       }
 
-      &:active:not(:disabled), &:focus:not(:disabled) {
+      &:active:not(:disabled) {
         box-shadow: inset 0 0 0 2px rgba(0,0,0,.3);
       }
     }
@@ -76,6 +77,23 @@
 
       &:hover {
         border-color: #333;
+      }
+    }
+
+    &[type=link] {
+      background: #fff;
+      box-shadow: none;
+      color: #18a0fb;
+      display: inline-flex;
+      align-items: center;
+      background: #18a0fb1a;
+
+      svg {
+        margin-right: .5rem;
+      }
+
+      &:active:not(:disabled) {
+        box-shadow: inset 0 0 0 2px rgba(#18a0fb, .3);
       }
     }
   }

@@ -76,9 +76,10 @@
       overflow: hidden;
       
       textarea {
+        position: relative;
         display: block;
         height: 4rem;
-        padding: 1.25rem .75rem .5rem;
+        padding: 1.25rem .5rem .5rem .75rem;
         width: 100%;
         border: none;
         outline: none;
@@ -86,12 +87,68 @@
         margin: 0;
         border-radius: 3px;
         border: 1px solid #e5e5e5;
-        box-shadow: inset 0 0 0 2px transparent;
+        box-shadow: inset 0 0 0 2px transparent!important;
         line-height: 1rem;
         resize: none;
+        overflow-y: scroll;
+        
+        // &::-webkit-scrollbar {
+        //   width: 7px;
+        //   position: absolute;
+        //   right: 0;
+        //   top: 0;
+        //   cursor: pointer;
+        //   overflow: visible;
+        // }
+
+        // &::-webkit-scrollbar-track {
+        //   opacity: 0;
+        // }
+
+        // &::-webkit-scrollbar-thumb {
+        //   // background: #ddd;
+        //   // border-left: 4px solid #ddd;
+        //   // border-radius: 10px 40px 40px 10px;
+        //   background: transparent;
+        //   box-shadow: inset 1px 0 green;
+          
+        //   &:hover {
+        //     border-color: #ccc;
+        //   }
+        // }
+
+
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          height: 6px;
+          border: 2px solid rgba(255, 255, 255, 0);
+          background-clip: padding-box;
+          border-radius: 7px;
+          background-color: #ddd;
+
+          &:hover {
+            background-color: #ccc;
+          }
+        }
+
+        &::-webkit-scrollbar-button {
+          width: 0;
+          height: 0;
+          display: none;
+        }
+
+        &::-webkit-scrollbar-corner {
+          background-color: transparent;
+        }
+
+
 
         &:focus {
-          box-shadow: inset 0 0 0 2px #18a0fb;
+          box-shadow: inset 0 0 0 2px #18a0fb!important;
           border-color: transparent;
         }
 
@@ -129,7 +186,7 @@
       .floated-label-bg {
         left: 3px;
         top: 1px;
-        width: calc(100% - 16px - 6px);
+        width: calc(100% - 12px);
         height: calc(1.25rem - 1px);
         background: #fff;
         border-top: 2px;

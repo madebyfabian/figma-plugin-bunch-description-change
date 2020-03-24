@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="currSelValid">
+    <div v-if="currSelValid" id="ui">
       <section id="main">
         <div class="text-input-group">
           <TextareaInput 
@@ -27,10 +27,6 @@
           />
 
           <div class="buttons">
-            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NAME_OR_MATCH')">
-              Current {{ matchValueEmpty ? 'name' : 'match' }}
-            </FigmaButton>
-
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NUMBER_ASC')">
               Number <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M.14 3.133L3.163.138c.186-.184.486-.184.672 0l3.025 2.995c.185.183.185.481 0 .665-.186.184-.487.184-.672 0L3.975 1.607V8h-.95V1.607L.81 3.798c-.185.184-.486.184-.672 0-.185-.184-.185-.482 0-.665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
             </FigmaButton>
@@ -38,30 +34,40 @@
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NUMBER_DESC')">
               Number <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M6.86 4.867L3.837 7.862c-.186.184-.486.184-.672 0L.139 4.867c-.185-.183-.185-.481 0-.665.186-.184.487-.184.672 0l2.214 2.191V0h.95v6.393L6.19 4.202c.185-.184.486-.184.672 0 .185.184.185.482 0 .665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
             </FigmaButton>
+
+            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NAME_OR_MATCH')">
+              Current {{ dataHasChanged ? 'match' : 'name' }}
+            </FigmaButton>
           </div>
         </div>
 
 
-        <div class="buttons">
+        <div class="buttons buttons--big">
           <FigmaButton 
-            :disabled="!!this.values.replace.length === false"
             type="primary"
             class="button"
+            ref="changeBtn"
             @click="clickChangeBtn">
 
             Change
+          </FigmaButton>
+
+          <FigmaButton
+            type="secondary"
+            class="button"
+            @click="clickUseLastChanges">
+            
+            Use recent values
           </FigmaButton>
         </div>
       </section>
 
       <section id="preview">
-        <div class="preview-scroll">
-          <div class="data-table-new">
-            <div class="row" v-for="item of currData" :key="item.id">
-              <div class="col col--description" v-if="!!item.description.length" v-text="item.description"></div>
-              <div class="col col--description col--empty" v-else>No description</div>
-              <div class="col col--name" :title="item.name" v-text="item.name"></div>
-            </div>
+        <div class="data-table">
+          <div class="row" v-for="item of data.curr" :key="item.id">
+            <div class="col col--description" v-if="item.description.length" v-text="item.description"></div>
+            <div class="col col--description col--empty" v-else>No description</div>
+            <div class="col col--name" :title="item.name" v-text="item.name"></div>
           </div>
         </div>
       </section>
@@ -76,7 +82,6 @@
 <script>
   const postMsg = (type, value) => parent.postMessage({ pluginMessage: { type, value }}, '*')
 
-  import TextInput from '../components/TextInput'
   import TextareaInput from '../components/TextareaInput'
   import SwitchInput from '../components/SwitchInput'
   import FigmaButton from '../components/FigmaButton'
@@ -84,7 +89,7 @@
   export default {
     name: "App",
 
-    components: { TextInput, SwitchInput, FigmaButton, TextareaInput },
+    components: { SwitchInput, FigmaButton, TextareaInput },
 
     data: () => ({
       values: {
@@ -92,18 +97,22 @@
         replace: '',
         useRegexMatch: false
       },
-      currSelValid: true,
-      currData: null,
-      originalData: null
+
+      data: {
+        curr: null,
+        original: null
+      },
+
+      currSelValid: true
     }),
 
     methods: {
-      changeData() {
-        this.currData = this.currData.map((item, i) => {
+      inputChange() {
+        this.data.curr = this.data.curr.map((item, i) => {
           let description
 
           if (!this.values.match.length)
-            description = (!this.values.replace.length) ? this.originalData[i].description : this.values.replace
+            description = (!this.values.replace.length) ? this.data.original[i].description : this.values.replace
           else {
             let matchStr = this.values.match
             if (this.values.useRegexMatch) {
@@ -113,11 +122,11 @@
                 matchStr = ''
               }
             }
-            description = this.originalData[i].description.replace(matchStr, this.values.replace)
+            description = this.data.original[i].description.replace(matchStr, this.values.replace)
           }
 
           // Now replace all variables with their' data
-          description = description.replace(/\$&/gi, this.matchValueEmpty ? item.name : this.values.match)
+          description = description.replace(/\$&/gi, this.dataHasChanged ? this.values.match : item.name)
 
           const ascNumberMatches = description.match(/\$n+/g) || []
           for (const str of ascNumberMatches) {
@@ -126,16 +135,22 @@
 
           const descNumberMatches = description.match(/\$N+/g) || []
           for (const str of descNumberMatches) {
-            description = description.replace(str, String(this.currData.length - i - 1).padStart(str.length - 1, '0'))
+            description = description.replace(str, String(this.data.curr.length - i - 1).padStart(str.length - 1, '0'))
           }
             
           return { ...item, description }
         })
       },
 
+      clickUseLastChanges() {
+        postMsg('clickUseLastChanges', {})
+      },
+
       clickChangeBtn() {
-        Object.assign(this.$data.values, this.$options.data().values);
-        postMsg('changeBtnClicked', this.currData)
+        postMsg('changeBtnClicked', {
+          data: (this.dataHasChanged) ? this.data.curr : null,
+          values: this.values
+        })
       },
 
       clickReplaceShortcut(action) {
@@ -145,20 +160,20 @@
           'NUMBER_DESC': '$NN'
         }
         
-        this.values.replace = this.values.replace + translate[action]
+        this.values.replace += translate[action]
       }
     },
 
     watch: {
-      values: {
-        handler() { this.changeData() },
+      'values': {
+        handler() { this.inputChange() },
         deep: true
       }
     },
 
     computed: {
-      'matchValueEmpty'() {
-        return !this.values.match.length
+      'dataHasChanged'() {
+        return JSON.stringify(this.data.curr) !== JSON.stringify(this.data.original)
       }
     },
 
@@ -171,10 +186,22 @@
             if (!this.currSelValid) 
               return
 
-            this.currData = msg.value
-            this.originalData = JSON.parse(JSON.stringify(msg.value))
+            this.data.curr = msg.value
+            this.data.original = JSON.parse(JSON.stringify(msg.value))
 
-            this.changeData()
+            this.inputChange()
+
+            break
+          }
+
+          case 'clickUseLastChanges': {
+            this.values = msg.value
+            break
+          }
+
+          case 'resetValues': {
+            Object.assign(this.$data.values, this.$options.data().values)
+            break
           }
         }
       }
@@ -190,6 +217,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+
+  #ui {
+    display: flex;
+    flex-flow: column;
+    height: 100vh;
   }
 
   #main {
@@ -208,7 +242,7 @@
 
     .text-input {
       margin: 0 1rem 0 0;
-      max-width: 200px;
+      max-width: calc(200px + 8px); // scrollbar
       flex-shrink: 0;
     }
 
@@ -228,47 +262,83 @@
     // justify-content: flex-end;
     flex-wrap: wrap;
     margin: -.25rem;
-    
+
     .button {
       margin: .25rem;
+    }
+
+    &--big {
+      margin: 0;
+      max-width: 208px;
+      justify-content: space-between;
+
+      .button {
+        margin: 0;
+      }
     }
   }
 
 
   #preview {
-    height: 168px;
+    flex: 1;
     overflow: hidden;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
+    overflow-x: hidden;
+    overflow-y: auto;
 
-    .preview-scroll {
-      height: 100%; // 5.5rem 
-      overflow-x: hidden;
-      overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
 
-    .data-table-new {
+    &::-webkit-scrollbar-thumb {
+      height: 6px;
+      border: 2px solid rgba(255, 255, 255, 0);
+      background-clip: padding-box;
+      border-radius: 7px;
+      background-color: #ddd;
+
+      &:hover {
+        background-color: #ccc;
+      }
+    }
+
+    &::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+
+    .data-table {
       width: 100%;
-      padding: .5rem 0;
 
       .row {
         padding: .5rem 1rem;
         display: grid;
         grid-template-columns: 174px 1fr;
-        gap: 1.5rem;
-        align-items: center;
+        gap: 2rem;
 
         &:nth-child(odd) { background: #fff }
         &:nth-child(even) { background: #F5F5F5 }
 
+        &:first-child { padding-top: 1rem }
+        &:last-child { padding-bottom: 1rem }
+
         .col {
           &--empty {
             color: #999;
+            font-style: italic;
           }
 
           &--description {
-            white-space: pre-line;
-            word-break: break-all; 
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            letter-spacing: 0px;
           }
 
           &--name {

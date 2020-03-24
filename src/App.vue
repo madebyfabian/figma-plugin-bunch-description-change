@@ -65,7 +65,7 @@
   }
 
   .using-keyboard *:focus {
-    box-shadow: 0 0 0 2px #18a0fb;
+    box-shadow: 0 0 0 2px #18a0fb!important;
   }
   
   body {

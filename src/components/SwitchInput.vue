@@ -4,6 +4,7 @@
       <input
         :name="name" 
         :checked="value"
+        :tabindex="1"
         @change="$emit('input', $event.target.checked)"
         type="checkbox" 
         class="switch__input" 
