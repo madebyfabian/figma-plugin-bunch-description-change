@@ -21,9 +21,9 @@ const onSelectionChange = () => {
 }
 
 
-const pluralize = (string: String, number: Number) => {
-  return `${ number } ${ number > 1 ? `${ string }s` : string }`
-}
+
+const pluralize = (count, noun, suffix = 's') =>
+  `${count} ${noun}${count !== 1 ? suffix : ''}`;
 
 
 figma.ui.onmessage = msg => {
@@ -37,7 +37,6 @@ figma.ui.onmessage = msg => {
 				const foundNodeOnCanvas = figma.currentPage.findOne(node => {
 					return node.type === 'COMPONENT' && node.id === item.id
 				})
-				foundNodeOnCanvas
 
 				foundNodeOnCanvas['description'] = item.description
 				selectionItems.push(foundNodeOnCanvas)
@@ -45,7 +44,7 @@ figma.ui.onmessage = msg => {
 
 			figma.currentPage.selection = selectionItems
 			
-			figma.notify(`👌 Changed the description of ${pluralize('node', figma.currentPage.selection.length)}!`)
+			figma.notify(`👌 Changed the description of ${ pluralize(figma.currentPage.selection.length, 'node') }!`)
 
 			onSelectionChange()
 

@@ -92,7 +92,7 @@
         replace: '',
         useRegexMatch: false
       },
-      currSelValid: false,
+      currSelValid: true,
       currData: null,
       originalData: null
     }),

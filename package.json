@@ -24,7 +24,5 @@
 		"webpack-cli": "^3.3.11",
 		"webpack-messages": "^2.0.4"
 	},
-	"dependencies": {
-		"vue-contenteditable": "^1.0.2"
-	}
+	"dependencies": {}
 }
