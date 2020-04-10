@@ -1,7 +1,0 @@
-{
-  "name": "[DEV] Bunch description change",
-  "id": "824407127671340098",
-  "api": "1.0.0",
-  "main": "build/main.js",
-  "ui": "build/ui.html"
-}
