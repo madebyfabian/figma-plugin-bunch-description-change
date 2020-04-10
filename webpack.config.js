@@ -1,10 +1,13 @@
 const path = require('path')
 
-const VueLoaderPlugin = require('vue-loader/lib/plugin'),
-			HtmlWebpackPlugin = require('html-webpack-plugin'),
+// Plugins
+const HtmlWebpackPlugin = require('html-webpack-plugin'),
 			HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin'),
 			WebpackMessages = require('webpack-messages'),
 			CopyPlugin = require('copy-webpack-plugin') // added by me
+
+// Vue-Specific Plugins
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 
 console.clear()
@@ -15,16 +18,17 @@ module.exports = (env, argv) => ({
 	// This is necessary because Figma's 'eval' works differently than normal eval
 	devtool: argv.mode === 'production' ? false : 'inline-source-map',
 
+	stats: false,
+
 	entry: {
 		main: './src/main.ts',
 		ui: './src/ui.ts'
 	},
 
-	resolveLoader: {
-		modules: [path.join(__dirname, 'node_modules')]
+	output: {
+		filename: '[name].js',
+		path: path.join(__dirname, 'build'),
 	},
-
-	stats: false,
 
 	module: {
 		rules: [
@@ -44,17 +48,16 @@ module.exports = (env, argv) => ({
 		],
 	},
 
+	resolveLoader: {
+		modules: [path.join(__dirname, 'node_modules')]
+	},
+
 	resolve: {
 		// Webpack tries these extensions for you if you omit the extension like "import './file'"
 		extensions: ['.tsx', '.ts', '.jsx', '.js', '.vue', '.json'],
 		alias: {
 			'vue$': 'vue/dist/vue.esm.js'
 		}
-	},
-
-	output: {
-		filename: '[name].js',
-		path: path.resolve(__dirname, 'build'),
 	},
 
 	plugins: [
@@ -75,7 +78,7 @@ module.exports = (env, argv) => ({
 				to: './manifest.json',
 				transform: (content, path) => {
 					try {
-						const str = content.toString().replace('__STATE__', (argv.mode === 'production' ? 'PRODUCTION READY' : 'DEV'))
+						const str = content.toString().replace('__STATE__', (argv.mode === 'production' ? '🚀 PROD' : '⚙️ DEV'))
 						return Buffer.from(str)
 					} catch (error) {
 						console.error(error)
