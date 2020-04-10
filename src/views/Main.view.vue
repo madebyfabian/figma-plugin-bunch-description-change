@@ -35,8 +35,8 @@
               Number <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M6.86 4.867L3.837 7.862c-.186.184-.486.184-.672 0L.139 4.867c-.185-.183-.185-.481 0-.665.186-.184.487-.184.672 0l2.214 2.191V0h.95v6.393L6.19 4.202c.185-.184.486-.184.672 0 .185.184.185.482 0 .665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
             </FigmaButton>
 
-            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NAME_OR_MATCH')">
-              Current {{ dataHasChanged ? 'match' : 'name' }}
+            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('DESCRIPTION_OR_MATCH')">
+              Current {{ replaceMatchInsteadOfDescription ? 'match' : 'description' }}
             </FigmaButton>
           </div>
         </div>
@@ -110,6 +110,7 @@
       inputChange() {
         this.data.curr = this.data.curr.map((item, i) => {
           let description
+          const originalDescriptionStr = this.data.original[i].description
 
           if (!this.values.match.length)
             description = (!this.values.replace.length) ? this.data.original[i].description : this.values.replace
@@ -126,7 +127,7 @@
           }
 
           // Now replace all variables with their' data
-          description = description.replace(/\$&/gi, this.dataHasChanged ? this.values.match : item.name)
+          description = description.replace(/\$&/gi, this.replaceMatchInsteadOfDescription ? this.values.match : originalDescriptionStr)
 
           const ascNumberMatches = description.match(/\$n+/g) || []
           for (const str of ascNumberMatches) {
@@ -155,7 +156,7 @@
 
       clickReplaceShortcut(action) {
         const translate = {
-          'NAME_OR_MATCH': '$&',
+          'DESCRIPTION_OR_MATCH': '$&',
           'NUMBER_ASC':  '$nn',
           'NUMBER_DESC': '$NN'
         }
@@ -174,6 +175,10 @@
     computed: {
       'dataHasChanged'() {
         return JSON.stringify(this.data.curr) !== JSON.stringify(this.data.original)
+      },
+
+      'replaceMatchInsteadOfDescription'() {
+        return this.values.match !== ''
       }
     },
 
