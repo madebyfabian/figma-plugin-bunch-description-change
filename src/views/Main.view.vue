@@ -38,6 +38,10 @@
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('DESCRIPTION_OR_MATCH')">
               Current {{ replaceMatchInsteadOfDescription ? 'match' : 'description' }}
             </FigmaButton>
+
+            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('LAYER_NAME')">
+              Current layer name
+            </FigmaButton>
           </div>
         </div>
 
@@ -48,7 +52,6 @@
             class="button"
             ref="changeBtn"
             @click="clickChangeBtn">
-
             Change
           </FigmaButton>
 
@@ -56,7 +59,6 @@
             type="secondary"
             class="button"
             @click="clickUseLastChanges">
-            
             Use recent values
           </FigmaButton>
         </div>
@@ -110,10 +112,12 @@
       inputChange() {
         this.data.curr = this.data.curr.map((item, i) => {
           let description
-          const originalDescriptionStr = this.data.original[i].description
+          const originalData = this.data.original[i]
+          const originalDescriptionStr = originalData.description
+          const layerNameStr = originalData.name
 
           if (!this.values.match.length)
-            description = (!this.values.replace.length) ? this.data.original[i].description : this.values.replace
+            description = (!this.values.replace.length) ? originalData.description : this.values.replace
           else {
             let matchStr = this.values.match
             if (this.values.useRegexMatch) {
@@ -123,11 +127,13 @@
                 matchStr = ''
               }
             }
-            description = this.data.original[i].description.replace(matchStr, this.values.replace)
+            description = originalData.description.replace(matchStr, this.values.replace)
           }
 
-          // Now replace all variables with their' data
+          // Now replace all variables with their data
           description = description.replace(/\$&/gi, this.replaceMatchInsteadOfDescription ? this.values.match : originalDescriptionStr)
+
+          description = description.replace(/\$L/gi, layerNameStr)
 
           const ascNumberMatches = description.match(/\$n+/g) || []
           for (const str of ascNumberMatches) {
@@ -138,7 +144,7 @@
           for (const str of descNumberMatches) {
             description = description.replace(str, String(this.data.curr.length - i - 1).padStart(str.length - 1, '0'))
           }
-            
+
           return { ...item, description }
         })
       },
@@ -157,6 +163,7 @@
       clickReplaceShortcut(action) {
         const translate = {
           'DESCRIPTION_OR_MATCH': '$&',
+          'LAYER_NAME': '$L',
           'NUMBER_ASC':  '$nn',
           'NUMBER_DESC': '$NN'
         }
