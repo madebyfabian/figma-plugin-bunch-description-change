@@ -36,11 +36,11 @@
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('DESCRIPTION_OR_MATCH')">
-              Current {{ replaceMatchInsteadOfDescription ? 'match' : 'description' }}
+              Curr. {{ replaceMatchInsteadOfDescription ? 'match' : 'description' }}
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('LAYER_NAME')">
-              Current layer name
+              Layer name
             </FigmaButton>
           </div>
         </div>

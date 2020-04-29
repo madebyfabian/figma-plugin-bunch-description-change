@@ -22,7 +22,7 @@ const onSelectionChange = () => {
 
 
 figma.showUI(__html__, { 
-	width: 408, 
+	width: 448, 
 	height: 376
 })
 
