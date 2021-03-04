@@ -4,8 +4,10 @@ const pluralize = (count, noun, suffix = 's') =>
 
 const onSelectionChange = () => {
 	// First, check if the current selection has any none-component nodes in it.
-	const filteredSel = figma.currentPage.selection.filter(selectionItem => selectionItem.type === 'COMPONENT')
-	const data = filteredSel.map((selectionItem: ComponentNode) => {
+	const filteredSel = figma.currentPage.selection.filter(selectionItem => 
+												selectionItem.type === 'COMPONENT' || selectionItem.type === 'COMPONENT_SET')
+
+	const data = filteredSel.map(( selectionItem: ComponentNode|ComponentSetNode ) => {
 		return {
 			id: selectionItem.id,
 			name: selectionItem.name,
@@ -45,9 +47,9 @@ figma.ui.onmessage = async msg => {
 			await figma.clientStorage.setAsync('lastUsedValues', msgValue.values)
 
 			for (const item of msgValue.data) {
-				let foundSelNode: ComponentNode
+				let foundSelNode: ComponentNode|ComponentSetNode
 				for (const currSelNode of currSel) {
-					if (currSelNode.type === 'COMPONENT' && item.id === currSelNode.id) {
+					if ((currSelNode.type === 'COMPONENT' || currSelNode.type === 'COMPONENT_SET') && item.id === currSelNode.id) {
 						foundSelNode = currSelNode
 						break
 					}
