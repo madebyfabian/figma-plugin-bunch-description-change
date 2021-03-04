@@ -1,6 +1,19 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "module": "esnext",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@figma"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ]
 }
