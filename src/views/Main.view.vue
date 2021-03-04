@@ -42,6 +42,10 @@
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('LAYER_NAME')">
               Layer name
             </FigmaButton>
+
+            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('CLEAR')">
+              Clear {{ replaceMatchInsteadOfDescription ? 'matched part' : 'whole description' }}
+            </FigmaButton>
           </div>
         </div>
 
@@ -135,6 +139,8 @@
 
           description = description.replace(/\$L/gi, layerNameStr)
 
+          description = description.replace(/\$CLEAR/gi, '')
+
           const ascNumberMatches = description.match(/\$n+/g) || []
           for (const str of ascNumberMatches) {
             description = description.replace(str, String(i).padStart(str.length - 1, '0'))
@@ -155,7 +161,7 @@
 
       clickChangeBtn() {
         postMsg('changeBtnClicked', {
-          data: (this.dataHasChanged) ? this.data.curr : null,
+          data: this.data.curr,
           values: this.values
         })
       },
@@ -165,7 +171,8 @@
           'DESCRIPTION_OR_MATCH': '$&',
           'LAYER_NAME': '$L',
           'NUMBER_ASC':  '$nn',
-          'NUMBER_DESC': '$NN'
+          'NUMBER_DESC': '$NN',
+          'CLEAR': '$CLEAR'
         }
         
         this.values.replace += translate[action]
