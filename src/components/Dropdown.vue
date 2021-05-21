@@ -1,6 +1,6 @@
 <template>
 	<div class="dropdown">
-		<select @change="e => $emit('input', e.target.value)">
+		<select @change="e => $emit('input', e.target.value)" tabindex="1">
 			<option 
 				v-for="(option, key) of options"
 				:key="key"
@@ -17,7 +17,8 @@
 	export default {
 		props: {
 			value: 		{ required: true },
-			options: 	{ required: true, type: Array }
+			options: 	{ required: true, type: Array },
+			tabindex: { default: 1 }
 		}
 	}
 </script>
