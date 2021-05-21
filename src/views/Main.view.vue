@@ -11,7 +11,7 @@
 
           <div>
             <Dropdown
-              v-model="values.useFieldType"
+              v-model="otherValues.useFieldType"
               :options="data.useFieldTypeValues"
               tabindex="1"
             />
@@ -110,7 +110,10 @@
       values: {
         match: '',
         replace: '',
-        useRegexMatch: false,
+        useRegexMatch: false
+      },
+
+      otherValues: {
         useFieldType: 'description'
       },
 
@@ -128,7 +131,7 @@
 
     computed: {
       'useDocumentationLinksFieldType'() {
-        return this.values.useFieldType === 'documentationLinks'
+        return this.otherValues.useFieldType === 'documentationLinks'
       },
 
       'documentationLinksFieldLabel'() {
