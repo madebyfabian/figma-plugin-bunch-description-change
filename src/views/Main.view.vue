@@ -9,13 +9,21 @@
             class="text-input"
           />
 
-          <SwitchInput
-            v-model="values.useRegexMatch" 
-            :value="values.useRegexMatch"
-            class="switch-input">
-            
-            Use RegEx
-          </SwitchInput>
+          <div>
+            <Dropdown
+              v-model="values.useFieldType"
+              :options="data.useFieldTypeValues"
+              tabindex="1"
+            />
+
+            <SwitchInput
+              v-model="values.useRegexMatch" 
+              :value="values.useRegexMatch"
+              class="switch-input">
+              
+              Use RegEx
+            </SwitchInput>
+          </div>
         </div>
 
 
@@ -35,8 +43,8 @@
               Number <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M6.86 4.867L3.837 7.862c-.186.184-.486.184-.672 0L.139 4.867c-.185-.183-.185-.481 0-.665.186-.184.487-.184.672 0l2.214 2.191V0h.95v6.393L6.19 4.202c.185-.184.486-.184.672 0 .185.184.185.482 0 .665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
             </FigmaButton>
 
-            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('DESCRIPTION_OR_MATCH')">
-              Curr. {{ replaceMatchInsteadOfDescription ? 'match' : 'description' }}
+            <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('VALUE_OR_MATCH')">
+              Curr. {{ replaceMatchInsteadOfValue ? 'match' : 'value' }}
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('LAYER_NAME')">
@@ -44,7 +52,7 @@
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('CLEAR')">
-              Clear {{ replaceMatchInsteadOfDescription ? 'matched part' : 'whole description' }}
+              Clear {{ replaceMatchInsteadOfValue ? 'matched part' : 'whole field' }} 
             </FigmaButton>
           </div>
         </div>
@@ -71,8 +79,8 @@
       <section id="preview">
         <div class="data-table">
           <div class="row" v-for="item of data.curr" :key="item.id">
-            <div class="col col--description" v-if="item.description.length" v-text="item.description"></div>
-            <div class="col col--description col--empty" v-else>No description</div>
+            <div class="col col--value" v-if="getFieldValueOfItem(item) !== '' && getFieldValueOfItem(item) !== undefined" v-text="getFieldValueOfItem(item)"></div>
+            <div class="col col--value col--empty" v-else>No {{ documentationLinksFieldLabel }}</div>
             <div class="col col--name" :title="item.name" v-text="item.name"></div>
           </div>
         </div>
@@ -91,67 +99,109 @@
   import TextareaInput from '../components/TextareaInput'
   import SwitchInput from '../components/SwitchInput'
   import FigmaButton from '../components/FigmaButton'
+  import Dropdown from '../components/Dropdown'
 
   export default {
     name: "App",
 
-    components: { SwitchInput, FigmaButton, TextareaInput },
+    components: { SwitchInput, FigmaButton, TextareaInput, Dropdown },
 
     data: () => ({
       values: {
         match: '',
         replace: '',
-        useRegexMatch: false
+        useRegexMatch: false,
+        useFieldType: 'description'
       },
 
       data: {
         curr: null,
-        original: null
+        original: null,
+        useFieldTypeValues: [
+          { value: 'description', label: 'Change Description' },
+          { value: 'documentationLinks', label: 'Change Documentation Link' }
+        ]
       },
 
       currSelValid: true
     }),
 
+    computed: {
+      'useDocumentationLinksFieldType'() {
+        return this.values.useFieldType === 'documentationLinks'
+      },
+
+      'documentationLinksFieldLabel'() {
+        return this.useDocumentationLinksFieldType ? 'documentation link' : 'description'
+      },
+
+      'dataHasChanged'() {
+        return JSON.stringify(this.data.curr) !== JSON.stringify(this.data.original)
+      },
+
+      'replaceMatchInsteadOfValue'() {
+        return this.values.match !== ''
+      }
+    },
+
     methods: {
+      /**
+       * Takes in an item (e.g. { name: '...', description: '...', documentationLinks: [...] }) and
+       * @returns {String} The Value of either the description or the documentationLinks field.
+       */
+      getFieldValueOfItem( item ) {
+        if (this.useDocumentationLinksFieldType)
+          return item.documentationLinks && item.documentationLinks[0] ? item.documentationLinks[0].uri : null
+        else
+          return item.description
+      },
+
       inputChange() {
-        this.data.curr = this.data.curr.map((item, i) => {
-          let description
+        this.data.curr = this.data.curr.map(( item, i ) => {
+          // Holds the string with the field's value
+          let fieldValue = ''
+
           const originalData = this.data.original[i]
-          const originalDescriptionStr = originalData.description
-          const layerNameStr = originalData.name
+          const originalFieldValue = this.getFieldValueOfItem(originalData) || ''
 
           if (!this.values.match.length)
-            description = (!this.values.replace.length) ? originalData.description : this.values.replace
+            fieldValue = (!this.values.replace.length) ? originalFieldValue : this.values.replace
           else {
             let matchStr = this.values.match
-            if (this.values.useRegexMatch) {
+            if (this.values.useRegexMatch)
               try {
                 matchStr = new RegExp(this.values.match)
               } catch (error) {
                 matchStr = ''
               }
-            }
-            description = originalData.description.replace(matchStr, this.values.replace)
+            
+            fieldValue = originalFieldValue.replace(matchStr, this.values.replace)
           }
 
           // Now replace all variables with their data
-          description = description.replace(/\$&/gi, this.replaceMatchInsteadOfDescription ? this.values.match : originalDescriptionStr)
+          fieldValue = fieldValue.replace(/\$&/gi, this.replaceMatchInsteadOfValue ? this.values.match : originalFieldValue)
+          fieldValue = fieldValue.replace(/\$L/gi, originalData.name)
+          fieldValue = fieldValue.replace(/\$CLEAR/gi, '')
 
-          description = description.replace(/\$L/gi, layerNameStr)
-
-          description = description.replace(/\$CLEAR/gi, '')
-
-          const ascNumberMatches = description.match(/\$n+/g) || []
+          const ascNumberMatches = fieldValue.match(/\$n+/g) || []
           for (const str of ascNumberMatches) {
-            description = description.replace(str, String(i).padStart(str.length - 1, '0'))
+            fieldValue = fieldValue.replace(str, String(i).padStart(str.length - 1, '0'))
           }
-
-          const descNumberMatches = description.match(/\$N+/g) || []
+          const descNumberMatches = fieldValue.match(/\$N+/g) || []
           for (const str of descNumberMatches) {
-            description = description.replace(str, String(this.data.curr.length - i - 1).padStart(str.length - 1, '0'))
+            fieldValue = fieldValue.replace(str, String(this.data.curr.length - i - 1).padStart(str.length - 1, '0'))
           }
 
-          return { ...item, description }
+          let returnData = { ...item }
+          if (this.useDocumentationLinksFieldType) {
+            // Check if value is valid url
+            returnData.documentationLinks = [{ uri: fieldValue }]
+          }
+            
+          else
+            returnData.description = fieldValue
+
+          return returnData
         })
       },
 
@@ -162,13 +212,14 @@
       clickChangeBtn() {
         postMsg('changeBtnClicked', {
           data: this.data.curr,
-          values: this.values
+          values: this.values,
+          useDocumentationLinksFieldType: this.useDocumentationLinksFieldType
         })
       },
 
       clickReplaceShortcut(action) {
         const translate = {
-          'DESCRIPTION_OR_MATCH': '$&',
+          'VALUE_OR_MATCH': '$&',
           'LAYER_NAME': '$L',
           'NUMBER_ASC':  '$nn',
           'NUMBER_DESC': '$NN',
@@ -186,19 +237,12 @@
       }
     },
 
-    computed: {
-      'dataHasChanged'() {
-        return JSON.stringify(this.data.curr) !== JSON.stringify(this.data.original)
-      },
-
-      'replaceMatchInsteadOfDescription'() {
-        return this.values.match !== ''
-      }
-    },
-
     created() {
       onmessage = event => {
         const msg = event.data.pluginMessage
+        if (!msg)
+          return 
+
         switch (msg.type) {
           case 'selectionchange': {
             this.currSelValid = !!msg.value.length
@@ -354,7 +398,7 @@
             font-style: italic;
           }
 
-          &--description {
+          &--value {
             white-space: pre-wrap;
             overflow-wrap: break-word;
             letter-spacing: 0px;

@@ -11,7 +11,8 @@ const onSelectionChange = () => {
 		return {
 			id: selectionItem.id,
 			name: selectionItem.name,
-			description: selectionItem.description
+			description: selectionItem.description,
+			documentationLinks: selectionItem.documentationLinks
 		}
 	})
 
@@ -55,7 +56,17 @@ figma.ui.onmessage = async msg => {
 					}
 				}
 
-				foundSelNode.description = item.description
+				try {
+					if (msgValue.useDocumentationLinksFieldType) {
+						if (item.documentationLinks[0].uri === '')
+							item.documentationLinks[0].uri = 'http://'
+
+						foundSelNode.documentationLinks = item.documentationLinks
+					} else
+						foundSelNode.description = item.description
+				} catch (error) {
+					return figma.notify(`😕 ${ error.message }`)
+				}
 			}
 
 			figma.ui.postMessage({ 
@@ -65,7 +76,8 @@ figma.ui.onmessage = async msg => {
 
 			onSelectionChange()
 
-			figma.notify(`👌 Changed the description of ${ pluralize(msgValue.data.length, 'Component') }!`)
+			const label = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
+			figma.notify(`👌 Changed the ${ label } of ${ pluralize(msgValue.data.length, 'Component') }!`)
 
 			break
 		}
