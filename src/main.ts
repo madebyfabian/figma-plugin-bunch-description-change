@@ -59,7 +59,7 @@ figma.ui.onmessage = async msg => {
 				try {
 					if (msgValue.useDocumentationLinksFieldType) {
 						if (item.documentationLinks[0].uri === '')
-							item.documentationLinks[0].uri = 'http://'
+							item.documentationLinks = []
 
 						foundSelNode.documentationLinks = item.documentationLinks
 					} else
