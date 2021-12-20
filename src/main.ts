@@ -30,6 +30,9 @@ let isDocumentWideMode = false
 const pluralize = (count, noun, suffix = 's') =>
   `${count} ${noun}${count !== 1 ? suffix : ''}`;
 
+const notifyForNoChanges = () => 
+	figma.notify('😁 Nothing has changed!')
+
 const transformComponentDataV2 = ( data: PageComponentsData[] ) => {
 	return data.map(( item: PageComponentsData ) => {
 		return <PageComponentsDataTransformed>{
@@ -128,7 +131,7 @@ figma.ui.onmessage = async msg => {
 	switch (msgType) {
 		case 'changeBtnClicked': {
 			if (!msgValue.data)
-				return figma.notify('😁 Nothing has changed!')
+				return notifyForNoChanges()
 
 			await figma.clientStorage.setAsync('lastUsedValues', msgValue.values)
 
@@ -144,14 +147,26 @@ figma.ui.onmessage = async msg => {
 
 					try {
 						if (msgValue.useDocumentationLinksFieldType) {
-							if (item.documentationLinks[0].uri === '')
+							const oldValue = node.documentationLinks?.[0]?.uri || ''
+							const newValue = item.documentationLinks?.[0]?.uri
+							const hasDifference = oldValue != newValue
+							if (!hasDifference)
+								continue
+
+							if (newValue === '') // hack because figma API is buggy
 								item.documentationLinks = []
 
-								node.documentationLinks = item.documentationLinks
-						} else
-							node.description = item.description
+							node.documentationLinks = item.documentationLinks
+							amountOfChanges++
 
-						amountOfChanges++
+						} else {
+							const hasDifference = node.description != item.description
+							if (!hasDifference)
+								continue
+
+							node.description = item.description
+							amountOfChanges++
+						}
 					} catch (error) {
 						return figma.notify(`😕 ${ error.message }`)
 					}
@@ -165,8 +180,13 @@ figma.ui.onmessage = async msg => {
 
 			doInit()
 
-			const label = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
-			figma.notify(`👌 Changed the ${ label } of ${ pluralize(amountOfChanges, 'Component') }!`)
+			if (amountOfChanges === 0) {
+				notifyForNoChanges()
+
+			} else {
+				const label = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
+				figma.notify(`👌 Changed the ${ label } of ${ pluralize(amountOfChanges, 'Component') }!`)
+			}
 
 			break
 		}
