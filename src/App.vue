@@ -1,5 +1,5 @@
 <template>
-	<main :class="a11yClass">
+	<main>
 		<MainView />
 	</main>
 </template>
@@ -11,24 +11,6 @@
 		name: 'App',
 
 		components: { MainView },
-
-		data() {
-			return {
-				a11yClass: 'using-keyboard',
-			}
-		},
-
-		methods: {
-			a11yClassChange(usingKeyboard) {
-				this.a11yClass = usingKeyboard ? 'using-keyboard' : 'using-mouse'
-			},
-		},
-
-		mounted() {
-			window.addEventListener('keydown', e => this.a11yClassChange(true))
-			window.addEventListener('mousedown', e => this.a11yClassChange(false))
-			window.addEventListener('touchstart', e => this.a11yClassChange(false))
-		},
 	}
 </script>
 
@@ -40,10 +22,6 @@
 		user-select: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-
-		&:focus {
-			outline: none;
-		}
 	}
 
 	*:not(html) {
@@ -66,7 +44,11 @@
 		line-height: 16px;
 	}
 
-	.using-keyboard *:focus {
+	*:focus {
+		outline: none;
+	}
+
+	*:focus:not(:focus-visible) {
 		box-shadow: 0 0 0 2px var(--figma-color-bg-brand) !important;
 	}
 
