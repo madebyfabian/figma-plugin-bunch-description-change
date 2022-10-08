@@ -36,65 +36,47 @@
     font-size: 11px;
     border: none;
     flex-shrink: 0;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.8);
+    box-shadow: inset 0 0 0 1px var(--figma-color-bg-inverse);
     
     &[type=primary] {
-      background: #18a0fb;
+      background: var(--figma-color-bg-brand);
       box-shadow: none;
-      color: #fff;
+      color: var(--figma-color-text-onbrand);
       font-weight: 500;
 
       &:disabled {
-        background: rgba(#000, .3);
+        background: var(--figma-color-bg-brand-tertiary);
       }
 
       &:active:not(:disabled) {
-        box-shadow: inset 0 0 0 2px rgba(0,0,0,.3);
+        box-shadow: inset 0 0 0 2px var(--figma-color-border-brand);
       }
     }
 
     &[type=secondary] {
-      background: #fff;
+      background: transparent;
+      box-shadow: inset 0 0 0 1px var(--figma-color-bg-inverse);
+      color: var(--figma-color-text);
 
       &:disabled {
-        color: rgba(#000, .3);
-        box-shadow: inset 0 0 0 1px rgba(#000, .3);
+        color: var(--figma-color-disabled);
+        box-shadow: inset 0 0 0 1px var(--figma-color-border-disabled);
       }
 
       &:active:not(:disabled), &:focus:not(:disabled) {
-        box-shadow: inset 0 0 0 2px #18a0fb;
+        box-shadow: inset 0 0 0 2px var(--figma-color-border-brand);
       }
     }
 
     &[type=tertiary] {
-      background: #fff;
+      background: transparent;
+      color: var(--figma-color-text);
       box-shadow: none;
-      border: 1px dashed #ccc;
+      border: 1px dashed var(--figma-color-bg-inverse);
       height: 1.75rem;
       line-height: calc(1.75rem - 2px);
       padding: 0 .5rem;
       border-radius: 3px;
-
-      &:hover {
-        border-color: #333;
-      }
-    }
-
-    &[type=link] {
-      background: #fff;
-      box-shadow: none;
-      color: #18a0fb;
-      display: inline-flex;
-      align-items: center;
-      background: #18a0fb1a;
-
-      svg {
-        margin-right: .5rem;
-      }
-
-      &:active:not(:disabled) {
-        box-shadow: inset 0 0 0 2px rgba(#18a0fb, .3);
-      }
     }
   }
 </style>

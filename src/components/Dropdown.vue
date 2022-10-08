@@ -30,6 +30,8 @@
 
 	select {
 		appearance: none;
+		background: var(--figma-color-bg);
+		color: var(--figma-color-text);
 		position: relative;
 		display: block;
 		height: 2rem;
@@ -39,7 +41,7 @@
 		outline: none;
 		margin: 0;
 		border-radius: 3px;
-		border: 1px solid #e5e5e5;
+		border: 1px solid var(--figma-color-border);
 		box-shadow: inset 0 0 0 2px transparent!important;
 	}
 

@@ -66,7 +66,7 @@
   .input {
     height: 4rem;
     width: 100%;
-    background-color: #fff;
+    background-color: var(--figma-color-bg);
     overflow: hidden;
     position: relative;
 
@@ -76,6 +76,8 @@
       overflow: hidden;
       
       textarea {
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
         position: relative;
         display: block;
         height: 4rem;
@@ -86,38 +88,12 @@
         appearance: none;
         margin: 0;
         border-radius: 3px;
-        border: 1px solid #e5e5e5;
+        border: 1px solid var(--figma-color-border);
         box-shadow: inset 0 0 0 2px transparent!important;
         line-height: 1rem;
         resize: none;
         overflow-y: scroll;
         
-        // &::-webkit-scrollbar {
-        //   width: 7px;
-        //   position: absolute;
-        //   right: 0;
-        //   top: 0;
-        //   cursor: pointer;
-        //   overflow: visible;
-        // }
-
-        // &::-webkit-scrollbar-track {
-        //   opacity: 0;
-        // }
-
-        // &::-webkit-scrollbar-thumb {
-        //   // background: #ddd;
-        //   // border-left: 4px solid #ddd;
-        //   // border-radius: 10px 40px 40px 10px;
-        //   background: transparent;
-        //   box-shadow: inset 1px 0 green;
-          
-        //   &:hover {
-        //     border-color: #ccc;
-        //   }
-        // }
-
-
         &::-webkit-scrollbar {
           width: 8px;
           height: 8px;
@@ -125,14 +101,10 @@
 
         &::-webkit-scrollbar-thumb {
           height: 6px;
-          border: 2px solid rgba(255, 255, 255, 0);
+          border: 2px solid transparent;
           background-clip: padding-box;
           border-radius: 7px;
-          background-color: #ddd;
-
-          &:hover {
-            background-color: #ccc;
-          }
+          background-color: var(--figma-color-bg-tertiary);
         }
 
         &::-webkit-scrollbar-button {
@@ -145,10 +117,8 @@
           background-color: transparent;
         }
 
-
-
         &:focus {
-          box-shadow: inset 0 0 0 2px #18a0fb!important;
+          box-shadow: inset 0 0 0 2px var(--figma-color-border-brand)!important;
           border-color: transparent;
         }
 
@@ -158,13 +128,13 @@
 
         &:focus ~ .floated-label-bg {
           // top: 3px;
-          border-top: 2px solid #18a0fb;
+          border-top: 2px solid var(--figma-color-border-brand);
         }
 
         // hide real placeholder
-        &::placeholder { color: #fff; opacity: 0 }
-        &:-ms-input-placeholder { color: #fff }
-        &::-ms-input-placeholder { color: #fff }
+        &::placeholder { color: var(--figma-color-bg); opacity: 0 }
+        &:-ms-input-placeholder { color: var(--figma-color-bg) }
+        &::-ms-input-placeholder { color: var(--figma-color-bg) }
       }
 
       label, .floated-label-bg {
@@ -188,7 +158,7 @@
         top: 1px;
         width: calc(100% - 12px);
         height: calc(1.25rem - 1px);
-        background: #fff;
+        background: var(--figma-color-bg);
         border-top: 2px;
       }
     }

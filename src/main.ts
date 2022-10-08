@@ -20,7 +20,8 @@ type TransformedComponentData = {
 
 figma.showUI(__html__, { 
 	width: 456, 
-	height: 416
+	height: 416,
+	themeColors: true
 })
 
 

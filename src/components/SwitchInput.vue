@@ -42,9 +42,7 @@
     }
 
     &__input {
-      --active: #333;
-      --active-inner: #fff;
-      --input-border: #333;
+      --input-border: var(--figma-color-border);
 
       -webkit-appearance: none;
       outline: none;
@@ -70,11 +68,11 @@
         position: absolute;
         border: 1px solid var(--input-border);
         transition: transform .2s ease;
-        background: #fff;
+        background: var(--figma-color-bg-inverse);
       }
       
       &:checked {
-        background-color: var(--active);
+        background-color: var(--figma-color-bg-tertiary);
         
         &:after {
           transform: translateX(12px);

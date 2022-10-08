@@ -65,11 +65,11 @@
   }
 
   .using-keyboard *:focus {
-    box-shadow: 0 0 0 2px #18a0fb!important;
+    box-shadow: 0 0 0 2px var(--figma-color-bg-brand)!important;
   }
   
   body {
-    color: #333;
+    color: var(--figma-color-text);
     overflow: hidden;
   }
 </style>

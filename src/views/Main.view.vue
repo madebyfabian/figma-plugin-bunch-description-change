@@ -36,11 +36,11 @@
 
           <div class="buttons">
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NUMBER_ASC')">
-              123 <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M6.86 4.867L3.837 7.862c-.186.184-.486.184-.672 0L.139 4.867c-.185-.183-.185-.481 0-.665.186-.184.487-.184.672 0l2.214 2.191V0h.95v6.393L6.19 4.202c.185-.184.486-.184.672 0 .185.184.185.482 0 .665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
+              123 &darr;
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('NUMBER_DESC')">
-              321 <span><svg class="svg" width="7" height="8" viewBox="0 0 7 8" xmlns="http://www.w3.org/2000/svg"><path d="M.14 3.133L3.163.138c.186-.184.486-.184.672 0l3.025 2.995c.185.183.185.481 0 .665-.186.184-.487.184-.672 0L3.975 1.607V8h-.95V1.607L.81 3.798c-.185.184-.486.184-.672 0-.185-.184-.185-.482 0-.665z" fill-rule="evenodd" fill-opacity="1" fill="#333" stroke="none"></path></svg></span>
+              321 &uarr;
             </FigmaButton>
 
             <FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('VALUE_OR_MATCH')">
@@ -344,7 +344,7 @@
       position: relative;
 
       span {
-        background: white;
+        background: var(--figma-color-bg);
         padding: .5rem;
         position: relative;
       }
@@ -355,7 +355,7 @@
         top: calc(50% - 0.5px);
         height: 1px;
         width: 100%;
-        background: rgba(0, 0, 0, .1);
+        background: var(--figma-color-border);
         position: absolute;
       }
     }
@@ -369,12 +369,16 @@
   }
 
   #main {
-    background: #fff;
     padding: 1.25rem 1rem;
     position: relative;
     z-index: 1;
     box-shadow: 0 3px 3px rgba(0,0,0,.08),
                 0 10px 25px rgba(0,0,0,.08)
+  }
+
+  @at-root .figma-dark #main {
+    box-shadow: 0 3px 3px rgba(0,0,0,.2),
+                0 10px 25px rgba(0,0,0,.2)
   }
 
   .link {
@@ -431,14 +435,10 @@
 
     &::-webkit-scrollbar-thumb {
       height: 6px;
-      border: 2px solid rgba(255, 255, 255, 0);
+      border: 2px solid transparent;
       background-clip: padding-box;
       border-radius: 7px;
-      background-color: #ddd;
-
-      &:hover {
-        background-color: #ccc;
-      }
+      background-color: var(--figma-color-bg-tertiary);
     }
 
     &::-webkit-scrollbar-button {
@@ -463,14 +463,20 @@
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 70%, rgba(255, 255, 255, 0));
       }
 
+      @at-root .figma-dark #preview .data-table {
+        &__header {
+          background: linear-gradient(to bottom, rgba(44, 44, 44, 0.95) 70%, rgba(44, 44, 44, 0));
+        }
+      }
+
       .row {
         padding: .5rem 1rem;
         display: grid;
         grid-template-columns: 174px 1fr;
         gap: 2rem;
 
-        &:nth-child(odd) { background: #fff }
-        &:nth-child(even) { background: #F5F5F5 }
+        &:nth-child(odd) { background: var(--figma-color-bg) }
+        &:nth-child(even) { background: var(--figma-color-bg-secondary) }
 
         &:first-child { padding-top: 1rem }
         &:last-child { padding-bottom: 1rem }
@@ -490,22 +496,16 @@
           &--name {
             position: relative;
             font-weight: 500;
-            color: #7B61FF;
+            color: var(--figma-color-text-component);
             display: inline-block;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-            padding-left: calc(1.25rem);
             font-feature-settings: 'ss02' on,'liga' on,'calt' on;
 
             &::before {
-              content: '';
-              position: absolute;
-              height: 1rem;
-              width: 1rem;
-              top: 0;
-              left: 0;
-              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237B61FF'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M5.743 4.748L8 2.5l2.257 2.248L8 6.996 5.743 4.748zm-.995 5.51L2.5 8l2.248-2.257L6.996 8l-2.248 2.257zm5.51.994L8 13.5l-2.257-2.248L8 9.004l2.257 2.248zM13.5 8l-2.248-2.257L9.004 8l2.248 2.257L13.5 8z' /%3E%3C/svg%3E");
+              content: '❖';
+              padding-right: 0.5rem;
             }
 
             svg {
