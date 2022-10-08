@@ -11,5 +11,8 @@
 		"jsx": "preserve",
 		"allowJs": true
 	},
+	"vueCompilerOptions": {
+		"target": 2
+	},
 	"include": ["src/**/*.ts", "src/**/*.vue"]
 }

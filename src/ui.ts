@@ -7,6 +7,6 @@ Vue.config.devtools = false
 
 /* eslint-disable no-new */
 export default new Vue({
-  el: '#app',
-  render: h => h(App)
+	el: '#app',
+	render: h => h(App),
 })

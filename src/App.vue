@@ -1,75 +1,77 @@
 <template>
-  <main :class="a11yClass">
-    <MainView />
-  </main>
+	<main :class="a11yClass">
+		<MainView />
+	</main>
 </template>
 
 <script>
-  import MainView from './views/Main.view'
+	import MainView from './views/Main.view'
 
-  export default {
-    name: "App",
+	export default {
+		name: 'App',
 
-    components: { MainView },
+		components: { MainView },
 
-    data() {
-      return {
-        'a11yClass': 'using-keyboard'
-      }
-    },
+		data() {
+			return {
+				a11yClass: 'using-keyboard',
+			}
+		},
 
-    methods: {
-      a11yClassChange(usingKeyboard) {
-        this.a11yClass = usingKeyboard ? 'using-keyboard' : 'using-mouse'
-      }
-    },
+		methods: {
+			a11yClassChange(usingKeyboard) {
+				this.a11yClass = usingKeyboard ? 'using-keyboard' : 'using-mouse'
+			},
+		},
 
-    mounted() {
-      window.addEventListener('keydown', (e) => this.a11yClassChange(true))
-      window.addEventListener('mousedown', (e) => this.a11yClassChange(false))
-      window.addEventListener('touchstart', (e) => this.a11yClassChange(false))
-    }
-  };
+		mounted() {
+			window.addEventListener('keydown', e => this.a11yClassChange(true))
+			window.addEventListener('mousedown', e => this.a11yClassChange(false))
+			window.addEventListener('touchstart', e => this.a11yClassChange(false))
+		},
+	}
 </script>
 
 <style lang="scss">
-  @import url('https://rsms.me/inter/inter.css');
+	@import url('https://rsms.me/inter/inter.css');
 
-  * {
-    font-family: 'Inter var', system-ui, sans-serif!important;
-    user-select: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	* {
+		font-family: 'Inter var', system-ui, sans-serif !important;
+		user-select: none;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 
-    &:focus { 
-      outline: none;
-    }
-  }
+		&:focus {
+			outline: none;
+		}
+	}
 
-  *:not(html) {
-    font-size: 11px;
-    letter-spacing: 0.055px;
-  }
+	*:not(html) {
+		font-size: 11px;
+		letter-spacing: 0.055px;
+	}
 
-  html {
-    font-size: 16px;
-  }
+	html {
+		font-size: 16px;
+	}
 
-  body {
-    margin: 0;
-  }
+	body {
+		margin: 0;
+	}
 
-  *, *::after, *::before {
-    box-sizing: border-box;
-    line-height: 16px;
-  }
+	*,
+	*::after,
+	*::before {
+		box-sizing: border-box;
+		line-height: 16px;
+	}
 
-  .using-keyboard *:focus {
-    box-shadow: 0 0 0 2px var(--figma-color-bg-brand)!important;
-  }
-  
-  body {
-    color: var(--figma-color-text);
-    overflow: hidden;
-  }
+	.using-keyboard *:focus {
+		box-shadow: 0 0 0 2px var(--figma-color-bg-brand) !important;
+	}
+
+	body {
+		color: var(--figma-color-text);
+		overflow: hidden;
+	}
 </style>

@@ -1,101 +1,95 @@
-type PageComponentsData = { 
-	pageId: string, 
-	pageName: string, 
-	components: ( ComponentNode | ComponentSetNode )[] 
+type PageComponentsData = {
+	pageId: string
+	pageName: string
+	components: (ComponentNode | ComponentSetNode)[]
 }
 
 type PageComponentsDataTransformed = {
-	pageId: string,
-	pageName: string,
+	pageId: string
+	pageName: string
 	transformedComponentDataArr: TransformedComponentData[]
 }
 
 type TransformedComponentData = {
-	id: string,
-	name: string,
-	description: string,
+	id: string
+	name: string
+	description: string
 	documentationLinks: DocumentationLink[]
 }
 
-
-figma.showUI(__html__, { 
-	width: 456, 
+figma.showUI(__html__, {
+	width: 456,
 	height: 416,
-	themeColors: true
+	themeColors: true,
 })
-
 
 let isDocumentWideMode = false
 
+const pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`
 
-const pluralize = (count, noun, suffix = 's') =>
-  `${count} ${noun}${count !== 1 ? suffix : ''}`;
+const notifyForNoChanges = () => figma.notify('😁 Nothing has changed!')
 
-const notifyForNoChanges = () => 
-	figma.notify('😁 Nothing has changed!')
-
-const transformComponentDataV2 = ( data: PageComponentsData[] ) => {
-	return data.map(( item: PageComponentsData ) => {
+const transformComponentDataV2 = (data: PageComponentsData[]) => {
+	return data.map((item: PageComponentsData) => {
 		return <PageComponentsDataTransformed>{
 			pageId: item.pageId,
 			pageName: item.pageName,
-			transformedComponentDataArr: item.components.map(( node ) => {
+			transformedComponentDataArr: item.components.map(node => {
 				return <TransformedComponentData>{
 					id: node.id,
 					name: node.name,
 					description: node.description,
-					documentationLinks: node.documentationLinks
+					documentationLinks: node.documentationLinks,
 				}
-			})
+			}),
 		}
 	})
 }
 
-const updateIsDocumentWideMode = ( newVal: boolean ) => {
+const updateIsDocumentWideMode = (newVal: boolean) => {
 	isDocumentWideMode = newVal
 
 	figma.ui.postMessage({
 		type: 'updateIsDocumentWideMode',
-		value: newVal
+		value: newVal,
 	})
 }
 
-
 const onSelectionChange = async () => {
-	let data : PageComponentsDataTransformed[] = []
+	let data: PageComponentsDataTransformed[] = []
 
 	if (!isDocumentWideMode) {
 		// First, check if the current selection has any none-component nodes in it.
-		const filteredSel = figma.currentPage.selection.filter(selectionItem => selectionItem.type === 'COMPONENT' || selectionItem.type === 'COMPONENT_SET')
+		const filteredSel = figma.currentPage.selection.filter(
+			selectionItem => selectionItem.type === 'COMPONENT' || selectionItem.type === 'COMPONENT_SET'
+		)
 
-		const preparedDataObj: PageComponentsData = { 
+		const preparedDataObj: PageComponentsData = {
 			pageId: figma.currentPage.id,
 			pageName: figma.currentPage.name,
-			components: <any[]>filteredSel
+			components: <any[]>filteredSel,
 		}
 
-		data = transformComponentDataV2([ preparedDataObj ])
+		data = transformComponentDataV2([preparedDataObj])
 	}
 
 	figma.ui.postMessage({
 		type: 'useNewComponentNodes',
-		value: data
+		value: data,
 	})
 }
-
 
 const getAllComponentsInDocument = () => {
 	// Find all documents in all pages & even the ones nested inside frames.
 	const preparedDataArr: PageComponentsData[] = []
 	for (const documentNode of figma.root.children) {
 		const components = documentNode.findAll(node => node.type === 'COMPONENT' || node.type === 'COMPONENT_SET')
-		if (!components.length)
-			continue
+		if (!components.length) continue
 
-		const preparedData : PageComponentsData = {
+		const preparedData: PageComponentsData = {
 			pageId: documentNode.id,
 			pageName: documentNode.name,
-			components: <any[]>components
+			components: <any[]>components,
 		}
 		preparedDataArr.push(preparedData)
 	}
@@ -104,89 +98,81 @@ const getAllComponentsInDocument = () => {
 
 	figma.ui.postMessage({
 		type: 'useNewComponentNodes',
-		value: data
+		value: data,
 	})
 }
 
-
 const doInit = async ({ initial = false } = {}) => {
-	if (initial) {		
+	if (initial) {
 		updateIsDocumentWideMode(false)
 	}
 
-	if (isDocumentWideMode)
-		getAllComponentsInDocument()
-	else
-		onSelectionChange()
+	if (isDocumentWideMode) getAllComponentsInDocument()
+	else onSelectionChange()
 }
-	
 
 doInit({ initial: true })
 
-figma.on('selectionchange', () => { doInit() })
-
+figma.on('selectionchange', () => {
+	doInit()
+})
 
 figma.ui.onmessage = async msg => {
 	const { type: msgType, value: msgValue } = msg
 
 	switch (msgType) {
 		case 'changeBtnClicked': {
-			if (!msgValue.data)
-				return notifyForNoChanges()
+			if (!msgValue.data) return notifyForNoChanges()
 
 			await figma.clientStorage.setAsync('lastUsedValues', msgValue.values)
 
-			const data : PageComponentsDataTransformed[] = msgValue.data
+			const data: PageComponentsDataTransformed[] = msgValue.data
 			let amountOfChanges = 0
 
 			for (const page of data) {
 				for (const item of page.transformedComponentDataArr) {
 					// Find item on canvas
 					const node = figma.getNodeById(item.id)
-					if (!(node?.type === 'COMPONENT' || node?.type === 'COMPONENT_SET') || node?.removed)
-						continue
+					if (!(node?.type === 'COMPONENT' || node?.type === 'COMPONENT_SET') || node?.removed) continue
 
 					try {
 						if (msgValue.useDocumentationLinksFieldType) {
 							const oldValue = node.documentationLinks?.[0]?.uri || ''
 							const newValue = item.documentationLinks?.[0]?.uri
 							const hasDifference = oldValue != newValue
-							if (!hasDifference)
-								continue
+							if (!hasDifference) continue
 
-							if (newValue === '') // hack because figma API is buggy
+							if (newValue === '')
+								// hack because figma API is buggy
 								item.documentationLinks = []
 
 							node.documentationLinks = item.documentationLinks
 							amountOfChanges++
-
 						} else {
 							const hasDifference = node.description != item.description
-							if (!hasDifference)
-								continue
+							if (!hasDifference) continue
 
 							node.description = item.description
 							amountOfChanges++
 						}
 					} catch (error) {
-						return figma.notify(`😕 ${ error.message }`)
+						return figma.notify(`😕 ${error.message}`)
 					}
 				}
 			}
 
-			figma.ui.postMessage({ 
+			figma.ui.postMessage({
 				type: 'resetValues',
-				value: null
+				value: null,
 			})
 
 			doInit()
 
 			if (amountOfChanges === 0) {
 				notifyForNoChanges()
-
 			} else {
 				const label = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
-				figma.notify(`👌 Changed the ${ label } of ${ pluralize(amountOfChanges, 'Component') }!`)
+				figma.notify(`👌 Changed the ${label} of ${pluralize(amountOfChanges, 'Component')}!`)
 			}
 
 			break
@@ -194,12 +180,11 @@ figma.ui.onmessage = async msg => {
 
 		case 'clickUseLastChanges': {
 			const values = await figma.clientStorage.getAsync('lastUsedValues')
-			if (!values)
-				return figma.notify('😌 No recent values found!')
+			if (!values) return figma.notify('😌 No recent values found!')
 
 			figma.ui.postMessage({
 				type: 'clickUseLastChanges',
-				value: values
+				value: values,
 			})
 
 			break
@@ -211,5 +196,3 @@ figma.ui.onmessage = async msg => {
 		}
 	}
 }
-
-

@@ -1,8 +1,7 @@
 declare global {
-  /**
-   * App-specific types.
-   */
+	/**
+	 * App-specific types.
+	 */
 }
-
 
 export {}
