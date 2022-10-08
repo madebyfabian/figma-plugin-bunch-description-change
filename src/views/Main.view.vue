@@ -6,7 +6,7 @@
 					<TextareaInput v-model="values.match" placeholder="Match (optional)" class="text-input" />
 
 					<div>
-						<Dropdown v-model="otherValues.useFieldType" :options="data.useFieldTypeValues" tabindex="1" />
+						<Dropdown v-model="useFieldType" :options="useFieldTypeValues" tabindex="1" />
 
 						<SwitchInput v-model="values.useRegexMatch" :value="values.useRegexMatch" class="switch-input">
 							Use RegEx
@@ -55,7 +55,7 @@
 
 						<SwitchInput
 							@input="val => updateIsDocumentWideMode(val)"
-							:value="otherValues.isDocumentWideMode"
+							:value="isDocumentWideMode"
 							class="switch-input"
 							style="margin-left: 1rem; margin-top: 0;"
 						>
@@ -73,7 +73,7 @@
 				<div class="data-table">
 					<section v-for="page of data.curr" :key="page.pageId">
 						<h3 class="data-table__header">
-							{{ otherValues.isDocumentWideMode ? page.pageName : 'Selected Components' }}
+							{{ isDocumentWideMode ? page.pageName : 'Selected Components' }}
 						</h3>
 						<div class="row" v-for="item of page.transformedComponentDataArr" :key="item.id">
 							<div
@@ -118,32 +118,31 @@
 		components: { SwitchInput, FigmaButton, TextareaInput, Dropdown },
 
 		data: () => ({
+			isDocumentWideMode: false,
+
+			currSelValid: true,
+
 			values: {
 				match: '',
 				replace: '',
 				useRegexMatch: false,
 			},
 
-			otherValues: {
-				useFieldType: 'description',
-				isDocumentWideMode: false,
-			},
+			useFieldType: 'description',
+			useFieldTypeValues: [
+				{ value: 'description', label: 'Change Description' },
+				{ value: 'documentationLinks', label: 'Change Documentation Link' },
+			],
 
 			data: {
 				curr: null,
 				original: null,
-				useFieldTypeValues: [
-					{ value: 'description', label: 'Change Description' },
-					{ value: 'documentationLinks', label: 'Change Documentation Link' },
-				],
 			},
-
-			currSelValid: true,
 		}),
 
 		computed: {
 			useDocumentationLinksFieldType() {
-				return this.otherValues.useFieldType === 'documentationLinks'
+				return this.useFieldType === 'documentationLinks'
 			},
 
 			documentationLinksFieldLabel() {
@@ -292,7 +291,7 @@
 					}
 
 					case 'updateIsDocumentWideMode': {
-						this.otherValues.isDocumentWideMode = msg.value
+						this.isDocumentWideMode = msg.value
 						break
 					}
 
