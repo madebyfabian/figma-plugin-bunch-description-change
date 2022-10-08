@@ -118,7 +118,7 @@
         }
 
         &:focus {
-          box-shadow: inset 0 0 0 2px var(--figma-color-border-brand)!important;
+          box-shadow: inset 0 0 0 2px var(--figma-color-bg-brand)!important;
           border-color: transparent;
         }
 
@@ -128,7 +128,7 @@
 
         &:focus ~ .floated-label-bg {
           // top: 3px;
-          border-top: 2px solid var(--figma-color-border-brand);
+          border-top: 2px solid var(--figma-color-bg-brand);
         }
 
         // hide real placeholder
