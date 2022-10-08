@@ -1,19 +1,15 @@
 {
-  "compilerOptions": {
-    "target": "es2017",
-    "moduleResolution": "node",
-    "module": "esnext",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-    }
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue"
-  ]
+	"compilerOptions": {
+		"target": "es2017",
+		"moduleResolution": "node",
+		"module": "esnext",
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"],
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"jsx": "preserve",
+		"allowJs": true
+	},
+	"include": ["src/**/*.ts", "src/**/*.vue"]
 }

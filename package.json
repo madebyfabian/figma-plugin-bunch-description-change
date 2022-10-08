@@ -8,10 +8,10 @@
 		"build": "webpack --mode=production"
 	},
 	"engines": {
-		"node": "^14 || ^15"
+		"node": "^14 || ^15 || ^16"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.23.0",
+		"@figma/plugin-typings": "^1.53.0",
 		"css-loader": "^3.4.2",
 		"html-webpack-inline-source-plugin": "0.0.10",
 		"html-webpack-plugin": "^3.2.0",
