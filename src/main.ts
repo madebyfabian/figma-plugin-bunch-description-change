@@ -1,21 +1,11 @@
-type PageComponentsData = {
-	pageId: string
-	pageName: string
-	components: (ComponentNode | ComponentSetNode)[]
-}
-
-type PageComponentsDataTransformed = {
-	pageId: string
-	pageName: string
-	transformedComponentDataArr: TransformedComponentData[]
-}
-
-type TransformedComponentData = {
-	id: string
-	name: string
-	description: string
-	documentationLinks: DocumentationLink[]
-}
+import {
+	pluralize,
+	notifyForNoChanges,
+	transformComponentDataV2,
+	findAllComponentsInPage,
+	findAllComponentsInDocument,
+} from './server/utils'
+import { isDocumentWideMode, updateIsDocumentWideMode } from './server/componentWideMode'
 
 figma.showUI(__html__, {
 	width: 456,
@@ -23,83 +13,18 @@ figma.showUI(__html__, {
 	themeColors: true,
 })
 
-let isDocumentWideMode = false
-
-const pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`
-
-const notifyForNoChanges = () => figma.notify('😁 Nothing has changed!')
-
-const transformComponentDataV2 = (data: PageComponentsData[]) => {
-	return data.map((item: PageComponentsData) => {
-		return <PageComponentsDataTransformed>{
-			pageId: item.pageId,
-			pageName: item.pageName,
-			transformedComponentDataArr: item.components.map(node => {
-				return <TransformedComponentData>{
-					id: node.id,
-					name: node.name,
-					description: node.description,
-					documentationLinks: node.documentationLinks,
-				}
-			}),
-		}
-	})
-}
-
-const updateIsDocumentWideMode = (newVal: boolean) => {
-	isDocumentWideMode = newVal
-
-	figma.ui.postMessage({
-		type: 'updateIsDocumentWideMode',
-		value: newVal,
-	})
-}
-
-const onSelectionChange = async () => {
-	let data: PageComponentsDataTransformed[] = []
-
-	if (!isDocumentWideMode) {
-		// First, check if the current selection has any none-component nodes in it.
-		const filteredSel = figma.currentPage.selection.filter(
-			selectionItem => selectionItem.type === 'COMPONENT' || selectionItem.type === 'COMPONENT_SET'
-		)
-
-		const preparedDataObj: PageComponentsData = {
-			pageId: figma.currentPage.id,
-			pageName: figma.currentPage.name,
-			components: <any[]>filteredSel,
-		}
-
-		data = transformComponentDataV2([preparedDataObj])
-	}
+const onSelectionChangeV2HandleComponents = () => {
+	const data = isDocumentWideMode ? findAllComponentsInDocument() : findAllComponentsInPage()
+	const transformedData = transformComponentDataV2(data)
 
 	figma.ui.postMessage({
 		type: 'useNewComponentNodes',
-		value: data,
+		value: transformedData,
 	})
 }
 
-const getAllComponentsInDocument = () => {
-	// Find all documents in all pages & even the ones nested inside frames.
-	const preparedDataArr: PageComponentsData[] = []
-	for (const documentNode of figma.root.children) {
-		const components = documentNode.findAll(node => node.type === 'COMPONENT' || node.type === 'COMPONENT_SET')
-		if (!components.length) continue
-
-		const preparedData: PageComponentsData = {
-			pageId: documentNode.id,
-			pageName: documentNode.name,
-			components: <any[]>components,
-		}
-		preparedDataArr.push(preparedData)
-	}
-
-	const data = transformComponentDataV2(preparedDataArr)
-
-	figma.ui.postMessage({
-		type: 'useNewComponentNodes',
-		value: data,
-	})
+const onSelectionChangeV2 = () => {
+	onSelectionChangeV2HandleComponents()
 }
 
 const doInit = async ({ initial = false } = {}) => {
@@ -107,8 +32,7 @@ const doInit = async ({ initial = false } = {}) => {
 		updateIsDocumentWideMode(false)
 	}
 
-	if (isDocumentWideMode) getAllComponentsInDocument()
-	else onSelectionChange()
+	onSelectionChangeV2()
 }
 
 doInit({ initial: true })
