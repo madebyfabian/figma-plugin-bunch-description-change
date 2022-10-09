@@ -1,13 +1,12 @@
 <template>
 	<div class="dropdown">
-		<select @change="e => $emit('input', e.target.value)" tabindex="1">
+		<select @change="e => $emit('update:modelValue', e.target.value)" tabindex="1">
 			<option
 				v-for="(option, key) of options"
 				:key="key"
 				:value="option.value"
-				:selected="option.value === value"
-				v-text="option.label"
-			/>
+				:selected="option.value === modelValue"
+				v-text="option.label" />
 		</select>
 		<span>⌃</span>
 	</div>
@@ -16,14 +15,14 @@
 <script>
 	export default {
 		props: {
-			value: { required: true },
+			modelValue: { required: true },
 			options: { required: true, type: Array },
 			tabindex: { default: 1 },
 		},
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 	.dropdown {
 		position: relative;
 	}

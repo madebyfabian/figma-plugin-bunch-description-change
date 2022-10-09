@@ -3,16 +3,13 @@
 		<div class="input__floating-label-container">
 			<textarea
 				@input="updateInput"
-				@focus="$emit('focus')"
-				@blur="$emit('blur')"
 				:name="name"
-				:value="value"
+				:value="modelValue"
 				:type="type"
 				:placeholder="placeholder"
 				:spellcheck="spellcheck"
 				:required="required"
-				ref="input"
-			/>
+				ref="input" />
 			<span class="floated-label-bg"></span>
 			<label :for="name">
 				{{ placeholder }}
@@ -29,7 +26,7 @@
 				type: String,
 				default: '',
 			},
-			value: {
+			modelValue: {
 				type: String,
 				default: '',
 			},
@@ -56,13 +53,13 @@
 		},
 		methods: {
 			updateInput() {
-				this.$emit('input', this.$refs.input.value)
+				this.$emit('update:modelValue', this.$refs.input.value)
 			},
 		},
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 	.input {
 		height: 4rem;
 		width: 100%;
@@ -128,11 +125,11 @@
 				}
 
 				&:focus ~ .floated-label-bg {
-					// top: 3px;
+					/* top: 3px; */
 					border-top: 2px solid var(--figma-color-bg-brand);
 				}
 
-				// hide real placeholder
+				/* hide real placeholder */
 				&::placeholder {
 					color: var(--figma-color-bg);
 					opacity: 0;

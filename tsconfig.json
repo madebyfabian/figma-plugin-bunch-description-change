@@ -1,18 +1,21 @@
 {
 	"compilerOptions": {
-		"target": "es2017",
-		"moduleResolution": "node",
+		"target": "esnext",
+		"useDefineForClassFields": true,
 		"module": "esnext",
-		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"],
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"]
-		},
+		"moduleResolution": "node",
+		"strict": true,
 		"jsx": "preserve",
-		"allowJs": true
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"lib": ["esnext", "dom"],
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"allowJs": true,
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
 	},
-	"vueCompilerOptions": {
-		"target": 2
-	},
-	"include": ["src/**/*.ts", "src/**/*.vue"]
+	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+	"references": [{ "path": "./tsconfig.node.json" }]
 }

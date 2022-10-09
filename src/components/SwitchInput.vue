@@ -3,13 +3,12 @@
 		<label>
 			<input
 				:name="name"
-				:checked="value"
+				:checked="modelValue"
 				:tabindex="1"
-				@change="$emit('input', $event.target.checked)"
+				@change="$emit('update:modelValue', $event.target.checked)"
 				type="checkbox"
 				class="switch__input"
-				ref="input"
-			/>
+				ref="input" />
 			<span class="switch__label"><slot /></span>
 		</label>
 	</div>
@@ -23,7 +22,7 @@
 				type: String,
 				default: '',
 			},
-			value: {
+			modelValue: {
 				type: Boolean,
 				required: true,
 			},
@@ -31,7 +30,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 	.switch {
 		display: flex;
 		height: 1rem;
@@ -60,8 +59,8 @@
 			&:after {
 				content: '';
 				display: block;
-				left: -1px; // hack
-				top: -1px; // hack
+				left: -1px; /* hack */
+				top: -1px; /* hack */
 				border-radius: 50%;
 				width: 12px;
 				height: 12px;

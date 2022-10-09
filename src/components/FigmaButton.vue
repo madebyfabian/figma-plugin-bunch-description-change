@@ -1,5 +1,5 @@
 <template>
-	<button @click="$emit('click')" :type="type" :tabindex="type === 'tertiary' ? 1 : 0" :disabled="disabled">
+	<button :type="type" :tabindex="type === 'tertiary' ? 1 : 0" :disabled="disabled">
 		<slot />
 	</button>
 </template>
@@ -21,7 +21,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 	button {
 		height: 2rem;
 		text-align: center;
