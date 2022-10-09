@@ -99,6 +99,11 @@ figma.ui.onmessage = async msg => {
 				const fieldTypeLabel = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
 				const editModeLabel = msgValue.componentData ? 'component' : 'style'
 				figma.notify(`👌 Changed the ${fieldTypeLabel} of ${pluralize(amountOfChanges, editModeLabel)}!`)
+
+				if (msgValue.styleData) {
+					// after we changed the styles, we need to update the ui also.
+					handleStylesRequest()
+				}
 			}
 
 			break
