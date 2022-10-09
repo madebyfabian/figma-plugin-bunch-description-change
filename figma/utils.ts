@@ -169,13 +169,13 @@ export const handleStyleDataChange = (
 			let style: StyleDataTypes | undefined
 
 			switch (item.type) {
-				case 'PAINT': {
-					style = figma.getLocalPaintStyles().find(style => style.id === item.id)
+				case 'TEXT': {
+					style = figma.getLocalTextStyles().find(style => style.id === item.id)
 					break
 				}
 
-				case 'TEXT': {
-					style = figma.getLocalTextStyles().find(style => style.id === item.id)
+				case 'PAINT': {
+					style = figma.getLocalPaintStyles().find(style => style.id === item.id)
 					break
 				}
 

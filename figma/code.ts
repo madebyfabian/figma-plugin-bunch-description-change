@@ -29,10 +29,10 @@ const onSelectionChangeHandleComponentsRequest = () => {
 
 const handleStylesRequest = () => {
 	const collectedStylesData = [
-		transformStyleData(figma.getLocalPaintStyles(), 'PAINT', '🎨 Paint'),
-		transformStyleData(figma.getLocalTextStyles(), 'TEXT', '📝 Text'),
-		transformStyleData(figma.getLocalEffectStyles(), 'EFFECT', '🌈 Effect'),
-		transformStyleData(figma.getLocalGridStyles(), 'GRID', '🔲 Grid'),
+		transformStyleData(figma.getLocalTextStyles(), 'TEXT', '📝 Text Styles'),
+		transformStyleData(figma.getLocalPaintStyles(), 'PAINT', '🎨 Paint Styles'),
+		transformStyleData(figma.getLocalEffectStyles(), 'EFFECT', '🌈 Effect Styles'),
+		transformStyleData(figma.getLocalGridStyles(), 'GRID', '🔲 Grid Styles'),
 	]
 
 	figma.ui.postMessage({

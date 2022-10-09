@@ -10,9 +10,9 @@ export type PageComponentsDataTransformed = {
 }
 
 // Styles
-export type StyleDataTypes = PaintStyle | TextStyle | EffectStyle | GridStyle
+export type StyleDataTypes = TextStyle | PaintStyle | EffectStyle | GridStyle
 export type StyleDataTypesCategory = StyleDataTypes['type']
-export type StyleDataTypesCategoryLabel = '🎨 Paint' | '📝 Text' | '🌈 Effect' | '🔲 Grid'
+export type StyleDataTypesCategoryLabel = '📝 Text Styles' | '🎨 Paint Styles' | '🌈 Effect Styles' | '🔲 Grid Styles'
 export type TransformedStyleData = Pick<StyleDataTypes, 'id' | 'name' | 'type' | 'description' | 'documentationLinks'>
 export type CategoryStyleDataTransformed = {
 	category: StyleDataTypesCategory

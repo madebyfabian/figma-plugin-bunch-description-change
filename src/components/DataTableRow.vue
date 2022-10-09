@@ -39,10 +39,10 @@
 			if (!('type' in props.item)) return ''
 
 			switch (props.item.type) {
-				case 'PAINT':
-					return '🎨'
 				case 'TEXT':
 					return '📝'
+				case 'PAINT':
+					return '🎨'
 				case 'EFFECT':
 					return '🌈'
 				case 'GRID':
