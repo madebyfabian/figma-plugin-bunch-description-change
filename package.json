@@ -13,7 +13,7 @@
 		"vue": "^3.2.25"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.53.0",
+		"@figma/plugin-typings": "^1.97.0",
 		"@vitejs/plugin-vue": "^2.3.1",
 		"postcss-atroot": "^0.2.3",
 		"postcss-nested": "^6.0.0",
