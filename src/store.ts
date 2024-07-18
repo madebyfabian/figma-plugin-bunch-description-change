@@ -1,7 +1,7 @@
 import { reactive, computed } from 'vue'
-import { TransformedComponentData, TransformedStyleData } from '../app.types'
+import { TransformedComponentData, TransformedStyleData, TransformedVariableData } from '../app.types'
 
-export type EditMode = 'components' | 'styles'
+export type EditMode = 'components' | 'styles' | 'variables'
 export type FieldType = 'description' | 'documentationLinks'
 
 const _initialState = {
@@ -31,18 +31,20 @@ export const replaceMatchInsteadOfValue = computed(() => {
  * Takes in an item and
  * @returns The Value of either the description or the documentationLinks field.
  */
-export const getFieldValueOfData = (item: TransformedComponentData | TransformedStyleData | null) => {
+export const getFieldValueOfData = (
+	item: TransformedComponentData | TransformedStyleData | TransformedVariableData | null
+) => {
 	if (!item) return null
-	if (store.useFieldType === 'documentationLinks')
+	if (store.useFieldType === 'documentationLinks' && 'documentationLinks' in item)
 		return item.documentationLinks && item.documentationLinks[0] ? item.documentationLinks[0].uri : null
 	else return item.description
 }
 
 export const transformFieldValue = <ReturnType = TransformedComponentData | TransformedStyleData>(
-	originalData: TransformedComponentData | TransformedStyleData,
-	newDataItem: TransformedComponentData | TransformedStyleData,
+	originalData: TransformedComponentData | TransformedStyleData | TransformedVariableData,
+	newDataItem: TransformedComponentData | TransformedStyleData | TransformedVariableData,
 	newDataItemKey: number,
-	allNewDataItems: (TransformedComponentData | TransformedStyleData)[]
+	allNewDataItems: (TransformedComponentData | TransformedStyleData | TransformedVariableData)[]
 ) => {
 	// Holds the string with the field's value
 	let fieldValue = ''
@@ -51,13 +53,30 @@ export const transformFieldValue = <ReturnType = TransformedComponentData | Tran
 
 	if (!store.values.match.length) fieldValue = !store.values.replace.length ? originalFieldValue : store.values.replace
 	else {
-		let matchStr = store.values.match
-		if (store.values.useRegexMatch)
+		let matchStr: RegExp | string = store.values.match
+		if (store.values.useRegexMatch) {
 			try {
-				matchStr = String(new RegExp(store.values.match))
+				// Try to generate a regex from the raw string
+				const generateRegex = () => {
+					// Extract the pattern and flags from the raw regex string
+					const regexParts = store.values.match.match(/^\/(.*?)\/([gimsuy]*)$/)
+					if (!regexParts) {
+						throw new Error('Invalid regex trying to generate')
+					}
+					const pattern = regexParts[1]
+					const flags = regexParts[2]
+					return new RegExp(pattern, flags)
+				}
+				const generatedRegex = generateRegex()
+				if (!generatedRegex) {
+					throw new Error('Invalid regex')
+				}
+
+				matchStr = generatedRegex
 			} catch (error) {
 				matchStr = ''
 			}
+		}
 
 		fieldValue = originalFieldValue.replace(matchStr, store.values.replace)
 	}
@@ -80,7 +99,7 @@ export const transformFieldValue = <ReturnType = TransformedComponentData | Tran
 	}
 
 	let returnData = { ...newDataItem }
-	if (store.useFieldType === 'documentationLinks') {
+	if (store.useFieldType === 'documentationLinks' && 'documentationLinks' in returnData) {
 		returnData.documentationLinks = [{ uri: fieldValue }]
 	} else {
 		returnData.description = fieldValue

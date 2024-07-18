@@ -1,4 +1,8 @@
-import type { CategoryStyleDataTransformed, PageComponentsDataTransformed } from '../app.types'
+import type {
+	CategoryStyleDataTransformed,
+	CollectionVariableDataTransformed,
+	PageComponentsDataTransformed,
+} from '../app.types'
 import { store, resetStore } from './store'
 
 export const postMsg = (type: string, value: unknown) => {
@@ -39,4 +43,9 @@ export type ComponentData = {
 export type StyleData = {
 	curr: CategoryStyleDataTransformed[] | null
 	original: CategoryStyleDataTransformed[] | null
+}
+
+export type VariableData = {
+	curr: CollectionVariableDataTransformed[] | null
+	original: CollectionVariableDataTransformed[] | null
 }

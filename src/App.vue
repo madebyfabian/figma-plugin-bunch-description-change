@@ -15,6 +15,7 @@
 	// Views
 	import ComponentsView from './views/Components.view.vue'
 	import StylesView from './views/Styles.view.vue'
+	import VariablesView from './views/Variables.view.vue'
 	const tabs = ref<(Tab & { component: unknown })[]>([
 		{
 			name: 'components',
@@ -25,6 +26,11 @@
 			name: 'styles',
 			label: 'Styles',
 			component: StylesView,
+		},
+		{
+			name: 'variables',
+			label: 'Variables',
+			component: VariablesView,
 		},
 	])
 	const currentTabItem = computed(() => {

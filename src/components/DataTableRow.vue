@@ -20,11 +20,11 @@
 
 <script setup lang="ts">
 	import { computed } from 'vue'
-	import { TransformedStyleData, TransformedComponentData } from '../../app.types'
+	import { TransformedComponentData, TransformedStyleData, TransformedVariableData } from '../../app.types'
 	import { store, getFieldValueOfData, EditMode } from '../store'
 
 	const props = defineProps<{
-		item: TransformedComponentData | TransformedStyleData
+		item: TransformedComponentData | TransformedStyleData | TransformedVariableData
 		editMode: EditMode
 	}>()
 
@@ -35,6 +35,19 @@
 	const icon = computed(() => {
 		if (props.editMode === 'components') {
 			return '❖'
+		} else if (props.editMode === 'variables') {
+			if (!('resolvedType' in props.item)) return '🔑'
+
+			switch (props.item.resolvedType) {
+				case 'BOOLEAN':
+					return '🔑'
+				case 'COLOR':
+					return '🎨'
+				case 'STRING':
+					return '📝'
+				case 'FLOAT':
+					return '🔢'
+			}
 		} else {
 			if (!('type' in props.item)) return ''
 

@@ -9,6 +9,8 @@ import {
 	transformStyleData,
 	handleComponentDataChange,
 	handleStyleDataChange,
+	transformVariableData,
+	handleVariableDataChange,
 } from './utils'
 
 figma.showUI(__html__, {
@@ -17,6 +19,7 @@ figma.showUI(__html__, {
 	themeColors: true,
 })
 
+// --- Components ---
 const onSelectionChangeHandleComponentsRequest = () => {
 	const data = isDocumentWideMode ? findAllComponentsInDocument() : findAllComponentsInPage()
 	const transformedData = transformComponentDataV2(data)
@@ -27,6 +30,7 @@ const onSelectionChangeHandleComponentsRequest = () => {
 	})
 }
 
+// --- Styles ---
 const handleStylesRequest = () => {
 	const collectedStylesData = [
 		transformStyleData(figma.getLocalTextStyles(), 'TEXT', '📝 Text Styles'),
@@ -38,6 +42,22 @@ const handleStylesRequest = () => {
 	figma.ui.postMessage({
 		type: 'useNewStyles',
 		value: collectedStylesData,
+	})
+}
+
+// --- Variables ---
+const handleVariablesRequest = async () => {
+	const collections = await figma.variables.getLocalVariableCollectionsAsync()
+	const variables = await figma.variables.getLocalVariablesAsync()
+
+	const collectedVariablesData = collections.map(collection => {
+		const variablesInCollection = variables.filter(variable => variable.variableCollectionId === collection.id)
+		return transformVariableData(variablesInCollection, collection.name)
+	})
+
+	figma.ui.postMessage({
+		type: 'useNewVariables',
+		value: collectedVariablesData,
 	})
 }
 
@@ -69,8 +89,13 @@ figma.ui.onmessage = async msg => {
 			break
 		}
 
+		case 'requestVariablesData': {
+			handleVariablesRequest()
+			break
+		}
+
 		case 'changeBtnClicked': {
-			if (!msgValue.componentData && !msgValue.styleData) {
+			if (!msgValue.componentData && !msgValue.styleData && !msgValue.variableData) {
 				return notifyForNoChanges()
 			}
 
@@ -82,6 +107,9 @@ figma.ui.onmessage = async msg => {
 			}
 			if (msgValue.styleData) {
 				amountOfChanges = handleStyleDataChange(msgValue.styleData, msgValue.useDocumentationLinksFieldType)
+			}
+			if (msgValue.variableData) {
+				amountOfChanges = await handleVariableDataChange(msgValue.variableData)
 			}
 
 			figma.ui.postMessage({
@@ -97,12 +125,24 @@ figma.ui.onmessage = async msg => {
 				notifyForNoChanges()
 			} else {
 				const fieldTypeLabel = msgValue.useDocumentationLinksFieldType ? 'documentation link' : 'description'
-				const editModeLabel = msgValue.componentData ? 'component' : 'style'
+
+				const getEditModeLabel = () => {
+					if (msgValue.componentData) return 'component'
+					if (msgValue.styleData) return 'style'
+					if (msgValue.variableData) return 'variable'
+				}
+				const editModeLabel = getEditModeLabel()
+
 				figma.notify(`👌 Changed the ${fieldTypeLabel} of ${pluralize(amountOfChanges, editModeLabel)}!`)
 
 				if (msgValue.styleData) {
 					// after we changed the styles, we need to update the ui also.
 					handleStylesRequest()
+				}
+
+				if (msgValue.variableData) {
+					// after we changed the variables, we need to update the ui also.
+					handleVariablesRequest()
 				}
 			}
 

@@ -4,9 +4,14 @@
 			<TextareaInput v-model="store.values.match" placeholder="Match (optional)" class="text-input" />
 
 			<div>
-				<Dropdown v-model="store.useFieldType" :options="store.useFieldTypeValues" tabindex="1" />
+				<Dropdown
+					v-if="editMode === 'components' || editMode === 'styles'"
+					v-model="store.useFieldType"
+					:options="store.useFieldTypeValues"
+					tabindex="1"
+					class="field-type-dropdown" />
 
-				<SwitchInput v-model="store.values.useRegexMatch" :value="store.values.useRegexMatch" class="switch-input">
+				<SwitchInput v-model="store.values.useRegexMatch" :value="store.values.useRegexMatch">
 					Use RegEx
 					<a
 						class="link"
@@ -36,7 +41,7 @@
 				</FigmaButton>
 
 				<FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('LAYER_NAME')">
-					{{ editMode === 'components' ? 'Layer' : 'Style' }} name
+					{{ layerNameLabel }}
 				</FigmaButton>
 
 				<FigmaButton type="tertiary" class="button" @click="clickReplaceShortcut('CLEAR')">
@@ -72,8 +77,9 @@
 </template>
 
 <script setup lang="ts">
+	import { computed } from 'vue'
 	import { store, replaceMatchInsteadOfValue, EditMode } from '../../store'
-	import { ComponentData, StyleData, postMsg, updateIsDocumentWideMode } from '../../utils'
+	import { ComponentData, StyleData, VariableData, postMsg, updateIsDocumentWideMode } from '../../utils'
 
 	// Components
 	import TextareaInput from '../TextareaInput.vue'
@@ -84,9 +90,21 @@
 	const props = defineProps<{
 		componentData?: ComponentData
 		styleData?: StyleData
+		variableData?: VariableData
 		editMode: EditMode
 		displayDisabled?: boolean
 	}>()
+
+	const layerNameLabel = computed(() => {
+		switch (props.editMode) {
+			case 'components':
+				return 'Layer name'
+			case 'variables':
+				return 'Variable name'
+			default:
+				return 'Style name'
+		}
+	})
 
 	// Methods
 	const clickReplaceShortcut = (action: 'VALUE_OR_MATCH' | 'LAYER_NAME' | 'NUMBER_ASC' | 'NUMBER_DESC' | 'CLEAR') => {
@@ -109,6 +127,7 @@
 		const options = {
 			componentData: null as unknown,
 			styleData: null as unknown,
+			variableData: null as unknown,
 			values: JSON.parse(JSON.stringify(store.values)),
 			useDocumentationLinksFieldType: store.useFieldType === 'documentationLinks',
 		}
@@ -116,6 +135,10 @@
 		switch (props.editMode) {
 			case 'components':
 				options.componentData = JSON.parse(JSON.stringify(props.componentData?.curr))
+				break
+
+			case 'variables':
+				options.variableData = JSON.parse(JSON.stringify(props.variableData?.curr))
 				break
 
 			default:
@@ -158,6 +181,10 @@
 
 		.switch-input {
 			margin-top: 0.75rem;
+		}
+
+		.field-type-dropdown {
+			margin-bottom: 0.75rem;
 		}
 
 		.buttons {

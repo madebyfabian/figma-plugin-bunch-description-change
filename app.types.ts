@@ -19,3 +19,11 @@ export type CategoryStyleDataTransformed = {
 	categoryLabel: StyleDataTypesCategoryLabel
 	transformedStyleDataArr: TransformedStyleData[]
 }
+
+// Variables
+export type VariableTypes = Variable
+export type TransformedVariableData = Pick<Variable, 'id' | 'name' | 'description' | 'resolvedType'>
+export type CollectionVariableDataTransformed = {
+	collectionName: string
+	transformedVariableDataArr: TransformedVariableData[]
+}

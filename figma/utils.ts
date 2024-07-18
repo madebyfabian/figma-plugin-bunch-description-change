@@ -7,6 +7,9 @@ import type {
 	StyleDataTypesCategoryLabel,
 	CategoryStyleDataTransformed,
 	ComponentNodeTypes,
+	TransformedVariableData,
+	CollectionVariableDataTransformed,
+	VariableTypes,
 } from '../app.types'
 
 export const pluralize = (count, noun, suffix = 's') => `${count} ${noun}${count !== 1 ? suffix : ''}`
@@ -84,29 +87,29 @@ export const findAllComponentsInDocument = () => {
 	return preparedDataArr
 }
 
-const updateNodeOrStyleData = (
-	nodeOrStyle: ComponentNodeTypes | StyleDataTypes,
-	newItem: TransformedComponentData | TransformedStyleData,
+const updateValues = (
+	item: ComponentNodeTypes | StyleDataTypes | VariableTypes,
+	newData: TransformedComponentData | TransformedStyleData | TransformedVariableData,
 	useDocumentationLinksFieldType: boolean
 ) => {
 	let hadDifference = false
 
-	if (useDocumentationLinksFieldType) {
-		const oldValue = nodeOrStyle.documentationLinks?.[0]?.uri || ''
-		const newValue = newItem.documentationLinks?.[0]?.uri
+	if (useDocumentationLinksFieldType && 'documentationLinks' in newData && 'documentationLinks' in item) {
+		const oldValue = item.documentationLinks?.[0]?.uri || ''
+		const newValue = newData.documentationLinks?.[0]?.uri
 		const hasDifference = oldValue != newValue
 		if (!hasDifference) return hadDifference
 
 		if (newValue === '')
 			// hack because figma API is buggy
-			newItem.documentationLinks = []
+			newData.documentationLinks = []
 
-		nodeOrStyle.documentationLinks = newItem.documentationLinks
+		item.documentationLinks = newData.documentationLinks
 	} else {
-		const hasDifference = nodeOrStyle.description != newItem.description
+		const hasDifference = item.description != newData.description
 		if (!hasDifference) return hadDifference
 
-		nodeOrStyle.description = newItem.description
+		item.description = newData.description
 	}
 
 	hadDifference = true
@@ -125,7 +128,7 @@ export const handleComponentDataChange = (
 			if (!(node?.type === 'COMPONENT' || node?.type === 'COMPONENT_SET') || node?.removed) continue
 
 			try {
-				const hadDifference = updateNodeOrStyleData(node, item, useDocumentationLinksFieldType)
+				const hadDifference = updateValues(node, item, useDocumentationLinksFieldType)
 				if (hadDifference) amountOfChanges++
 			} catch (error) {
 				figma.notify(`😕 ${error.message}`)
@@ -192,7 +195,45 @@ export const handleStyleDataChange = (
 			if (!style) continue
 
 			try {
-				const hadDifference = updateNodeOrStyleData(style, item, useDocumentationLinksFieldType)
+				const hadDifference = updateValues(style, item, useDocumentationLinksFieldType)
+				if (hadDifference) amountOfChanges++
+			} catch (error) {
+				figma.notify(`😕 ${error.message}`)
+				return -1
+			}
+		}
+	}
+
+	return amountOfChanges
+}
+
+// -- Variables
+export const transformVariableData = (variables: Variable[], collectionName: string) => {
+	return <CollectionVariableDataTransformed>{
+		collectionName,
+		transformedVariableDataArr: variables.map(variable => {
+			const obj: TransformedVariableData = {
+				id: variable.id,
+				name: variable.name,
+				description: variable.description,
+				resolvedType: variable.resolvedType,
+			}
+			return obj
+		}),
+	}
+}
+
+export const handleVariableDataChange = async (data: CollectionVariableDataTransformed[]) => {
+	const allVariables = await figma.variables.getLocalVariablesAsync()
+	let amountOfChanges = 0
+
+	for (const collection of data) {
+		for (const item of collection.transformedVariableDataArr) {
+			const variable = allVariables.find(variable => variable.id === item.id)
+			if (!variable) continue
+
+			try {
+				const hadDifference = updateValues(variable, item, false)
 				if (hadDifference) amountOfChanges++
 			} catch (error) {
 				figma.notify(`😕 ${error.message}`)
