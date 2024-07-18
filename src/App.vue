@@ -39,10 +39,8 @@
 </script>
 
 <style lang="postcss">
-	@import url('https://rsms.me/inter/inter.css');
-
 	* {
-		font-family: 'Inter var', system-ui, sans-serif !important;
+		font-family: 'Inter Var', Inter, system-ui, sans-serif !important;
 		user-select: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
